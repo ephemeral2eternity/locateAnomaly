@@ -55,4 +55,5 @@ def traceroute(dest_name):
 
 if __name__ == "__main__":
     hops = traceroute('104.197.6.6')
-    print hops
+    print hops[1]['Name']
+    print len(hops)
