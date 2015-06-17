@@ -8,6 +8,7 @@ import time
 import math
 import urllib2
 from attach_cache_agent import *
+from traceroute import *
 
 ## ======================================================================== 
 # Wait for a random period of time
@@ -61,17 +62,3 @@ def update_cache_agent(client, cache_agent):
 		print "Update cache agent for client :", client, " and its cache agent is ", cache_agent, " successfully!"
 	except:
 		print "Failed to update cache agent for client ", client, " to cmu-agens server!"
-
-## ======================================================================== 
-# Connect the client to its closest cache agent
-# @input : client ---- The client name
-#		   cache_agent ---- The cache agent the client is connecting to
-## ========================================================================
-def connect_cache_agent(client, cache_agent, cache_agent_ip):
-	update_url = "http://%s:8615/client/add?%s" % (cache_agent_ip, client)
-	try:
-		rsp = urllib2.urlopen(update_url)
-		print rsp
-		print "Connect client :", client, " to its cache agent ", cache_agent, " successfully!"
-	except:
-		print "Failed to connect client ", client, " to its cache_agent", cache_agent, "!"

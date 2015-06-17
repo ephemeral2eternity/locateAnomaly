@@ -38,12 +38,17 @@ def traceroute(dest_name):
 
         if curr_addr is not None:
             curr_host = "%s (%s) %.2f (ms)" % (curr_name, curr_addr, timeElapsed)
+            hop_name = str(curr_name)
+            hop_addr = str(curr_addr)
         else:
             curr_host = "*"
-        print "%d\t%s" % (ttl, curr_host)
+            hop_name = "*"
+            hop_addr = "*"
+
+        # print "%d\t%s" % (ttl, curr_host)
         hop = dict()
-        hop['Name'] = curr_name
-        hop['Addr'] = curr_addr
+        hop['Name'] = hop_name
+        hop['Addr'] = hop_addr
         hop['Time'] = timeElapsed
         hops[ttl] = hop
 
