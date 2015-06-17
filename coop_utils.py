@@ -5,6 +5,7 @@
 import random
 import time
 import math
+import os
 import urllib2
 from attach_cache_agent import *
 from traceroute import *
@@ -46,7 +47,9 @@ def get_all_routes():
 # Filename: ./dat/info
 #==========================================================================================
 def get_info():
-	filename = "./dat/info"
+	full_path = os.path.realpath(__file__)
+	path, fn = os.path.split(full_path)
+	filename = path + "/dat/info"
 	fo = open(filename, "r")
 
 	lines = fo.read().splitlines()
