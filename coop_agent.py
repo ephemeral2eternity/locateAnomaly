@@ -55,6 +55,7 @@ class MyHandler(BaseHTTPRequestHandler):
 			if "ico" in self.command:
 				return
 
+			## Show all the traceroute info to all servers
 			elif self.path == '/':
 				page = welcome_page()
 				self.send_response(200)
@@ -63,6 +64,7 @@ class MyHandler(BaseHTTPRequestHandler):
 				self.wfile.write(page)
 				return
 
+			## Get the QoE, video, and route info from a peer client
 			elif self.path.startswith('/get'):
 				srv_info = get_info()
 				srv_qoe = srv_info['qoe']
@@ -72,6 +74,7 @@ class MyHandler(BaseHTTPRequestHandler):
 				pkt = dict()
 				pkt['qoe'] = str(srv_qoe)
 				pkt['route'] = srv_route_str
+				pkt['video'] = srv_info['video']
 
 				self.send_response(200)
 				self.send_header('Content-type', 'text/html')
@@ -81,7 +84,6 @@ class MyHandler(BaseHTTPRequestHandler):
 				cur_page = "<h1>The packet sent to other clients for anomaly localization is: </h1>"
 				cur_page = cur_page + "<p>" + json.dumps(pkt) + "</p>"
 				self.wfile.write(cur_page)
-
 				return
 
 			else:

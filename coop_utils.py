@@ -49,16 +49,24 @@ def get_all_routes():
 def get_info():
 	full_path = os.path.realpath(__file__)
 	path, fn = os.path.split(full_path)
+
+	## Read the server address and the video ID.
 	filename = path + "/dat/info"
 	fo = open(filename, "r")
-
 	lines = fo.read().splitlines()
 	srv = lines[0]
-	qoe = lines[1]
+	video = lines[1]
+
+	## Read the recent monitored QoE
+	qoeFileName = path + "/dat/qoe"
+	qoeFile = open(qoeFileName, "r")
+	lines = qoeFile.read().splitlines()
+	qoe = lines[0]
 
 	info = dict()
 	info['srv'] = srv
 	info['qoe'] = float(qoe)
+	info['video'] = video
 
 	return info
 
