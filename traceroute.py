@@ -45,7 +45,7 @@ def traceroute(dest_name):
             hop_name = "*"
             hop_addr = "*"
 
-        # print "%d\t%s" % (ttl, curr_host)
+        print "%d\t%s" % (ttl, curr_host)
         hop = dict()
         hop['Name'] = hop_name
         hop['Addr'] = hop_addr
@@ -61,4 +61,5 @@ def traceroute(dest_name):
 if __name__ == "__main__":
     hops = traceroute('104.197.6.6')
     print hops[1]['Name']
+    print hops[2]['Name']
     print len(hops)
