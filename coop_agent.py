@@ -144,6 +144,7 @@ def main(argv):
 	print "Client ", client_name, " is connecting to cache agent : ", cache_agent['name']
 	connect_cache_agent(client_name, cache_agent['name'], cache_agent['ip'])
 	update_cache_agent(client_name, cache_agent['name'])
+	create_db()
 
 	## Start listening as a server on PORT
 	server = HTTPServer(('', PORT), MyHandler)
