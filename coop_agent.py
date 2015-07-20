@@ -9,6 +9,7 @@ import os # os. path
 from attach_cache_agent import *
 from test_utils import *
 from coop_utils import *
+import urlparse
 
 ## Globe Variables
 PORT = 8717
@@ -16,7 +17,6 @@ hostname = getMyName()
 
 # Get Trace Routes from all servers
 all_hops = get_all_routes()
-
 
 #==========================================================================================
 # Write out an welcome page showing all routes to all cache agents deployed in Google Cloud
@@ -27,6 +27,7 @@ def welcome_page():
                     Client Peer " + hostname + "Listening on Port: " + str(PORT) + " \
                 </title> \
                 <body>  \
+                	<h1>Client Peer " + hostname + "Listening on Port: " + str(PORT) + "</h1> \
                     <h1> The routes from client " + hostname + "to all servers include followings: </h1> \
                     <ul>"
 
@@ -65,16 +66,20 @@ class MyHandler(BaseHTTPRequestHandler):
 				return
 
 			## Get the QoE, video, and route info from a peer client
-			elif self.path.startswith('/get'):
-				srv_info = get_info()
-				srv_qoe = srv_info['qoe']
-				srv_route_str = get_route_str(srv_info['srv'], all_hops)
+			elif self.path.startswith('/get?'):
+				vidID = int(self.path.split('?')[1])
+
+				info = get_info(vidID)
+
+				srv = info['srv']
+				srv_qoe = info['qoe']
+				srv_route_str = get_route_str(srv, all_hops)
 
 				## Return the anomaly info for cooperative anomaly localization
 				pkt = dict()
 				pkt['qoe'] = str(srv_qoe)
 				pkt['route'] = srv_route_str
-				pkt['video'] = srv_info['video']
+				pkt['video'] = vidID
 
 				self.send_response(200)
 				self.send_header('Content-type', 'text/html')

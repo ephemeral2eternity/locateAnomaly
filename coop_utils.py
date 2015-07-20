@@ -4,11 +4,36 @@
 ## coop_utils.py
 import random
 import time
+import datetime
 import math
 import os
 import urllib2
+import sqlite3 as lite
 from attach_cache_agent import *
 from traceroute import *
+from sys_traceroute import *
+
+## ======================================================================== 
+# Create and Initialize a database to keep
+## ========================================================================
+def create_db():
+	full_path = os.path.realpath(__file__)
+	path, fn = os.path.split(full_path)
+	db_name = path + "/qoe.db"
+
+	# Create or connect to the denoted database
+	con = lite.connect(db_name)
+	cur = con.cursor()
+
+	# Check if there exists a table called QoE.
+	cur.execute("SELECT * FROM sqlite_master WHERE name='QoE' and type='table'")
+	rst = cur.fetchall()
+	if len(rst) < 1:
+		cur.execute("CREATE TABLE QoE(vidID int, srvName text, srvIP text, QoE real, TS datetime)")
+		cur.execute("INSERT INTO QoE(vidID, srvName, srvIP, QoE, TS) values (?, ?, ?, ?, ?)", (1, 'cmu-agens', '104.197.6.6', 5.0, datetime.now()))
+		con.commit()	
+
+	con.close()
 
 ## ======================================================================== 
 # Connect the client to its closest cache agent
@@ -37,7 +62,8 @@ def get_all_routes():
 
 	all_srv_hops = dict()
 	for srv in all_cache_agents.keys():
-		srv_hops = traceroute(all_cache_agents[srv])
+		# srv_hops = traceroute(all_cache_agents[srv])
+		srv_hops = sys_traceroute(all_cache_agents[srv])
 		all_srv_hops[all_cache_agents[srv]] = srv_hops
 
 	return all_srv_hops
@@ -46,22 +72,23 @@ def get_all_routes():
 # Read the client's latest QoE and streaming server address from temporary file
 # Filename: ./dat/info
 #==========================================================================================
-def get_info():
+def get_info(vidID):
 	full_path = os.path.realpath(__file__)
 	path, fn = os.path.split(full_path)
+	db_name = path + "/qoe.db"
 
-	## Read the server address and the video ID.
-	filename = path + "/dat/info"
-	fo = open(filename, "r")
-	lines = fo.read().splitlines()
-	srv = lines[0]
-	video = lines[1]
+	con = lite.connect(db_name)
+	cur = con.cursor()
 
-	## Read the recent monitored QoE
-	qoeFileName = path + "/dat/qoe"
-	qoeFile = open(qoeFileName, "r")
-	lines = qoeFile.read().splitlines()
-	qoe = lines[0]
+	SELECT_CMD = "SELECT * FROM QoE WHERE vidID=%d ORDER BY TS DESC LIMIT 1" % vidID
+	cur.execute(SELECT_CMD)
+	lite_info = cur.fetchall()
+	con.close()
+
+	## Read the server name, server address and the video ID.
+	srv = lite_info[0][2]
+	video = lite_info[0][0]
+	qoe = lite_info[0][3]
 
 	info = dict()
 	info['srv'] = srv
