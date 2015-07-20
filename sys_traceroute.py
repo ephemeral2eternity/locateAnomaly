@@ -15,20 +15,22 @@ def sys_traceroute(host):
 
         tr_line = line.replace('ms', '')
         tr_data = tr_line.split()
-        hop_id = int(tr_data[0])
-        hop = {}
-        if len(tr_data) < 4:
-            hop['Addr'] = "*"
-            hop['Name'] = "*"
-            hop['Time'] = "*"
-        else:
-            Addr = tr_data[2].replace('(', '')
-            Addr = Addr.replace(')', '')
-            hop['Addr'] = Addr
-            hop['Name'] = tr_data[1]
-            hop['Time'] = float(tr_data[3])
-        # print hop
-        hops[hop_id] = hop
+
+        if tr_data[0].isdigit():
+            hop_id = int(tr_data[0])
+            hop = {}
+            if len(tr_data) < 4:
+                hop['Addr'] = "*"
+                hop['Name'] = "*"
+                hop['Time'] = "*"
+            else:
+                Addr = tr_data[2].replace('(', '')
+                Addr = Addr.replace(')', '')
+                hop['Addr'] = Addr
+                hop['Name'] = tr_data[1]
+                hop['Time'] = float(tr_data[3])
+            # print hop
+            hops[hop_id] = hop
 
     return hops
 

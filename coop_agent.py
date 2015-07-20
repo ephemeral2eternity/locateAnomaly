@@ -71,15 +71,22 @@ class MyHandler(BaseHTTPRequestHandler):
 
 				info = get_info(vidID)
 
-				srv = info['srv']
-				srv_qoe = info['qoe']
-				srv_route_str = get_route_str(srv, all_hops)
+				pkt = wrapPKT(info)
 
-				## Return the anomaly info for cooperative anomaly localization
-				pkt = dict()
-				pkt['qoe'] = str(srv_qoe)
-				pkt['route'] = srv_route_str
-				pkt['video'] = vidID
+				self.send_response(200)
+				self.send_header('Content-type', 'text/html')
+				self.send_header('Params', json.dumps(pkt))
+				self.end_headers()
+
+				cur_page = "<h1>The packet sent to other clients for anomaly localization is: </h1>"
+				cur_page = cur_page + "<p>" + json.dumps(pkt) + "</p>"
+				self.wfile.write(cur_page)
+				return
+
+			## Get the latest observation from local client
+			elif self.path.startswith('/latest'):
+				info = get_latest()
+				pkt = wrapPKT(info)
 
 				self.send_response(200)
 				self.send_header('Content-type', 'text/html')
@@ -105,6 +112,25 @@ class MyHandler(BaseHTTPRequestHandler):
 		self.wfile.write( "File uploaded under name: " + os.path.split(fullname)[1] );
 		self.wfile.write(  '<BR><A HREF=%s>back</A>' % ( UPLOAD_PAGE, )  )
 		self.wfile.write("</BODY></HTML>");
+
+#==========================================================================================
+# Wrap info dict obtained from reading qoe.db to a packet to send over http
+#==========================================================================================
+def wrapPKT(info):
+	srv = info['srv']
+	srv_qoe = info['qoe']
+	srv_name = info['srvName']
+	srv_route_str = get_route_str(srv, all_hops)
+
+	## Return the anomaly info for cooperative anomaly localization
+	pkt = dict()
+	pkt['qoe'] = str(srv_qoe)
+	pkt['route'] = srv_route_str
+	pkt['video'] = vidID
+	pkt['srv'] = srv
+	pkt['srvName'] = srv_name
+
+	return pkt
 
 #==========================================================================================
 # Main Function of A Cooperative Agent

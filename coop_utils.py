@@ -26,12 +26,11 @@ def create_db():
 	cur = con.cursor()
 
 	# Check if there exists a table called QoE.
-	cur.execute("SELECT * FROM sqlite_master WHERE name='QoE' and type='table'")
-	rst = cur.fetchall()
-	if len(rst) < 1:
-		cur.execute("CREATE TABLE QoE(vidID int, srvName text, srvIP text, QoE real, TS datetime)")
-		cur.execute("INSERT INTO QoE(vidID, srvName, srvIP, QoE, TS) values (?, ?, ?, ?, ?)", (1, 'cmu-agens', '104.197.6.6', 5.0, datetime.now()))
-		con.commit()	
+	cur.execute("CREATE TABLE QoE(vidID int, srvName text, srvIP text, QoE real, TS datetime)")
+	cur.execute("INSERT INTO QoE(vidID, srvName, srvIP, QoE, TS) values (?, ?, ?, ?, ?)", (1, 'cache-01', '104.197.42.89', 5.0, datetime.datetime.now()))
+	cur.execute("INSERT INTO QoE(vidID, srvName, srvIP, QoE, TS) values (?, ?, ?, ?, ?)", (1, 'cache-02', '104.197.59.54', 5.0, datetime.datetime.now()))
+	cur.execute("INSERT INTO QoE(vidID, srvName, srvIP, QoE, TS) values (?, ?, ?, ?, ?)", (1, 'cache-03', '104.197.8.50', 5.0, datetime.datetime.now()))
+	con.commit()	
 
 	con.close()
 
@@ -69,8 +68,7 @@ def get_all_routes():
 	return all_srv_hops
 
 #==========================================================================================
-# Read the client's latest QoE and streaming server address from temporary file
-# Filename: ./dat/info
+# Read the client's latest QoE and streaming server address for a certain video
 #==========================================================================================
 def get_info(vidID):
 	full_path = os.path.realpath(__file__)
@@ -89,13 +87,46 @@ def get_info(vidID):
 	srv = lite_info[0][2]
 	video = lite_info[0][0]
 	qoe = lite_info[0][3]
+	srv_name = lite_info[0][1]
 
 	info = dict()
 	info['srv'] = srv
+	info['srvName'] = srv_name
 	info['qoe'] = float(qoe)
 	info['video'] = video
 
 	return info
+
+#==========================================================================================
+# Read the client's latest QoE and streaming server address from qoe.db
+#==========================================================================================
+def get_latest():
+	full_path = os.path.realpath(__file__)
+	path, fn = os.path.split(full_path)
+	db_name = path + "/qoe.db"
+
+	con = lite.connect(db_name)
+	cur = con.cursor()
+
+	SELECT_CMD = "SELECT * FROM QoE ORDER BY TS DESC LIMIT 1"
+	cur.execute(SELECT_CMD)
+	lite_info = cur.fetchall()
+	con.close()
+
+	## Read the server name, server address and the video ID.
+	srv = lite_info[0][2]
+	video = lite_info[0][0]
+	qoe = lite_info[0][3]
+	srv_name = lite_info[0][1]
+
+	info = dict()
+	info['srv'] = srv
+	info['srvName'] = srv_name
+	info['qoe'] = float(qoe)
+	info['video'] = video
+
+	return info
+
 
 #==========================================================================================
 # Get the string of route info from all routes
