@@ -37,8 +37,7 @@ def client_agent(cache_agent_obj, video_id, method, expID=None):
 	else:
 		cur_ts = time.strftime("%m%d%H%M")
 		client_ID = client + "_" + cur_ts + "_" + method
-	videoName = 'BBB'
-
+	videoName = 'st'
 
 	## ==================================================================================================
 	## Get the initial streaming server
