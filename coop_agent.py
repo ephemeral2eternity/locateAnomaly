@@ -120,6 +120,7 @@ def wrapPKT(info):
 	srv = info['srv']
 	srv_qoe = info['qoe']
 	srv_name = info['srvName']
+	vidID = info['video']
 	srv_route_str = get_route_str(srv, all_hops)
 
 	## Return the anomaly info for cooperative anomaly localization
