@@ -273,4 +273,7 @@ def client_agent(cache_agent_obj, video_id, method, expID=None):
 	if os.path.exists('./tmp'):
 		shutil.rmtree('./tmp')
 
+	## Close the connection to database.
+	con.close()
+
 	return
