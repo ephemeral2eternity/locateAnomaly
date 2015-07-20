@@ -117,19 +117,22 @@ class MyHandler(BaseHTTPRequestHandler):
 # Wrap info dict obtained from reading qoe.db to a packet to send over http
 #==========================================================================================
 def wrapPKT(info):
-	srv = info['srv']
-	srv_qoe = info['qoe']
-	srv_name = info['srvName']
-	vidID = info['video']
-	srv_route_str = get_route_str(srv, all_hops)
+	if not info:
+		pkt = {}
+	else:
+		srv = info['srv']
+		srv_qoe = info['qoe']
+		srv_name = info['srvName']
+		vidID = info['video']
+		srv_route_str = get_route_str(srv, all_hops)
 
-	## Return the anomaly info for cooperative anomaly localization
-	pkt = dict()
-	pkt['qoe'] = str(srv_qoe)
-	pkt['route'] = srv_route_str
-	pkt['video'] = vidID
-	pkt['srv'] = srv
-	pkt['srvName'] = srv_name
+		## Return the anomaly info for cooperative anomaly localization
+		pkt = dict()
+		pkt['qoe'] = str(srv_qoe)
+		pkt['route'] = srv_route_str
+		pkt['video'] = vidID
+		pkt['srv'] = srv
+		pkt['srvName'] = srv_name
 
 	return pkt
 

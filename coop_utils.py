@@ -84,16 +84,21 @@ def get_info(vidID):
 	con.close()
 
 	## Read the server name, server address and the video ID.
-	srv = lite_info[0][2]
-	video = lite_info[0][0]
-	qoe = lite_info[0][3]
-	srv_name = lite_info[0][1]
+	if len(lite_info) > 0:
+		srv = lite_info[0][2]
+		video = lite_info[0][0]
+		qoe = lite_info[0][3]
+		srv_name = lite_info[0][1]
 
-	info = dict()
-	info['srv'] = srv
-	info['srvName'] = srv_name
-	info['qoe'] = float(qoe)
-	info['video'] = video
+		info = dict()
+		info['srv'] = srv
+		info['srvName'] = srv_name
+		info['qoe'] = float(qoe)
+		info['video'] = video
+
+	## Should add code to handle empty info.
+	else:
+		info = {}
 
 	return info
 
@@ -114,16 +119,21 @@ def get_latest():
 	con.close()
 
 	## Read the server name, server address and the video ID.
-	srv = lite_info[0][2]
-	video = lite_info[0][0]
-	qoe = lite_info[0][3]
-	srv_name = lite_info[0][1]
+	if len(lite_info) > 0:
+		## Read the server name, server address and the video ID.
+		srv = lite_info[0][2]
+		video = lite_info[0][0]
+		qoe = lite_info[0][3]
+		srv_name = lite_info[0][1]
 
-	info = dict()
-	info['srv'] = srv
-	info['srvName'] = srv_name
-	info['qoe'] = float(qoe)
-	info['video'] = video
+		info = dict()
+		info['srv'] = srv
+		info['srvName'] = srv_name
+		info['qoe'] = float(qoe)
+		info['video'] = video
+
+	else:
+		info = {}
 
 	return info
 
