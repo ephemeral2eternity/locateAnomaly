@@ -26,7 +26,7 @@ def create_db():
 	cur = con.cursor()
 
 	# Check if there exists a table called QoE.
-	cur.execute("CREATE TABLE QoE(vidID int, srvName text, srvIP text, QoE real, TS datetime)")
+	cur.execute("CREATE TABLE IF NOT EXISTS QoE(vidID int, srvName text, srvIP text, QoE real, TS datetime)")
 	cur.execute("INSERT INTO QoE(vidID, srvName, srvIP, QoE, TS) values (?, ?, ?, ?, ?)", (1, 'cache-01', '104.197.42.89', 5.0, datetime.datetime.now()))
 	cur.execute("INSERT INTO QoE(vidID, srvName, srvIP, QoE, TS) values (?, ?, ?, ?, ?)", (1, 'cache-02', '104.197.59.54', 5.0, datetime.datetime.now()))
 	cur.execute("INSERT INTO QoE(vidID, srvName, srvIP, QoE, TS) values (?, ?, ?, ?, ?)", (1, 'cache-03', '104.197.8.50', 5.0, datetime.datetime.now()))
