@@ -51,7 +51,7 @@ def pingSrvs(candidates):
 #			False --- dead
 # ================================================================================
 def is_alive(cache_agent_ip):
-	url = 'http://%s:8615/video/getSrv?vidID=5&method=qoe'%cache_agent_ip
+	url = 'http://%s:8615/video/getSrv?vidID=1&method=qoe'%cache_agent_ip
 	print 'Testing if cache agent is alive:', url
 	try:
 		rsp = urllib2.urlopen(url)
@@ -64,6 +64,33 @@ def is_alive(cache_agent_ip):
 	except:
 		return False
 
+
+## ======================================================================== 
+# Connect the client to its closest cache agent
+# @input : client ---- The client name
+#		   cache_agent ---- The cache agent the client is connecting to
+## ========================================================================
+def connect_cache_agent(client, cache_agent, cache_agent_ip):
+	update_url = "http://%s:8615/client/add?%s" % (cache_agent_ip, client)
+	try:
+		rsp = urllib2.urlopen(update_url)
+		# print rsp
+		print "Connect client :", client, " to its cache agent ", cache_agent, " successfully!"
+	except:
+		print "Failed to connect client ", client, " to its cache_agent", cache_agent, "!"
+
+## ======================================================================== 
+# Update the client's cache agent to cmu-agens
+# @input : client ---- The client name
+#		   cache_agent ---- The cache agent the client is connecting to
+## ========================================================================
+def update_cache_agent(client, cache_agent):
+	update_url = "http://104.197.6.6:8000/cacheagent/add?client=%s&cache_agent=%s" % (client, cache_agent)
+	try:
+		rsp = urllib2.urlopen(update_url)
+		print "Update cache agent for client :", client, " and its cache agent is ", cache_agent, " successfully!"
+	except:
+		print "Failed to update cache agent for client ", client, " to cmu-agens server!"
 
 # ================================================================================
 # Attach the closest cache agent to the client.
@@ -81,6 +108,8 @@ def attach_cache_agent():
 		all_cache_agents = get_cache_agents()
 		trial_num = trial_num + 1
 
+	## Connect to the cache agent and tell the cache agent the client has connected
+	client = getMyName()
 	if all_cache_agents:
 		srvRtts = pingSrvs(all_cache_agents)
 		sorted_srv_rtts = sorted(srvRtts.items(), key=operator.itemgetter(1))
@@ -89,6 +118,7 @@ def attach_cache_agent():
 			cache_agent_obj['name'] = cache_agent
 			cache_agent_obj['ip'] = all_cache_agents[cache_agent]
 			if is_alive(cache_agent_obj['ip']):
+				connect_cache_agent(client, cache_agent_obj['name'], cache_agent_obj['ip'])
 				break
 	else:
 		logging.info("Agens client can not connect to any cache agent 20 times. The client might lose connection!!!")
