@@ -5,6 +5,7 @@
 import random
 import socket
 import urllib2
+import json
 
 ## ======================================================================== 
 # Get a peer client closeby/streaming from the same server to cooperate
@@ -17,6 +18,7 @@ import urllib2
 ## ========================================================================
 def get_peer(request_srv_ip, peer_type, excluding_name=None):
 	url = 'http://%s:8615/client/%s/' % (request_srv_ip, peer_type)
+	# print url
 
 	## Get latest 20 peers from the request_srv_ip
 	peers_info = {}
@@ -31,6 +33,7 @@ def get_peer(request_srv_ip, peer_type, excluding_name=None):
 	## Randomly get one peer and return
 	peer_info = {}
 	peer_list = peers_info.keys()
+	# print peer_list
 
 	## Excluding the current host and excluding_name from the list
 	hostname = socket.gethostname()

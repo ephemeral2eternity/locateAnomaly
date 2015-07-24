@@ -26,6 +26,7 @@ def update_edge_cfds_logger(src, pdst, vdst):
 	update_url = "http://173.255.112.124:8000/monitor/edge?src=%s&pdst=%s&vdst=%s" % (src, pdst,vdst)
 	try:
 		rsp = urllib2.urlopen(update_url)
-		print rsp
+		data = response.read()
+		print data
 	except:
 		print "Failed to update links from src=", src, " to pdst=", pdst, " and vdst=", vdst
