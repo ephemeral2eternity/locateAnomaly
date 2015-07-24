@@ -156,7 +156,7 @@ def main(argv):
 	insert_route(all_hops)
 
 	# Update the client hostname in the cfds-logger
-	update_cfds_logger(client_name)
+	update_client_cfds_logger(client_name)
 
 	## Start listening as a server on PORT
 	server = HTTPServer(('', PORT), MyHandler)

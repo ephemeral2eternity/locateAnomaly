@@ -16,12 +16,14 @@ from dash_utils import *
 from dash_qoe import *
 from attach_cache_agent import *
 from get_srv import *
+from get_peer import *
 from mpd_parser import *
 from download_chunk import *
 from client_utils import *
 from coop_utils import *
 from failover import *
 from cooperation import *
+from cfds_logger_utils import *
 
 ## ==================================================================================================
 # Define client_agent method that streams a video using server-side controlled server selection
@@ -59,8 +61,8 @@ def coop_client(cache_agent_obj, video_id, method, expID=None):
 
 	## ==================================================================================================
 	## Get peer client from the streaming server or from the closest cache agent
-	pclient = get_peer_client(cache_agent_ip, 'pclient')
-	vclient = get_peer_client(srv_info['ip'], 'vclient'， pclient['name'])
+	pclient = get_peer(cache_agent_ip, 'pclient')
+	vclient = get_peer(srv_info['ip'], 'vclient'， pclient['name'])
 	# log_peers(client, pclient, vclient)
 
 	## ==================================================================================================
