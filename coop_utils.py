@@ -9,9 +9,17 @@ import math
 import os
 import urllib2
 import sqlite3 as lite
+from calendar import timegm
 from attach_cache_agent import *
 from traceroute import *
 from sys_traceroute import *
+
+# Note: if you pass in a naive dttm object it's assumed to already be in UTC
+def unix_time(dttm=None):
+    if dttm is None:
+       dttm = datetime.utcnow()
+
+    return timegm(dttm.utctimetuple())
 
 ## ======================================================================== 
 # Create and Initialize a database to keep
@@ -76,12 +84,14 @@ def get_info(vidID):
 		video = lite_info[0][0]
 		qoe = lite_info[0][3]
 		srv_name = lite_info[0][1]
+		ts = lite_info[0][4]
 
 		info = dict()
 		info['srv'] = srv
 		info['srvName'] = srv_name
 		info['qoe'] = float(qoe)
 		info['video'] = video
+		info['ts'] = unix_time(ts)
 
 	## Should add code to handle empty info.
 	else:
@@ -112,12 +122,14 @@ def get_latest():
 		video = lite_info[0][0]
 		qoe = lite_info[0][3]
 		srv_name = lite_info[0][1]
+		ts = lite_info[0][4]
 
 		info = dict()
 		info['srv'] = srv
 		info['srvName'] = srv_name
 		info['qoe'] = float(qoe)
 		info['video'] = video
+		info['ts'] = unix_time(ts)
 
 	else:
 		info = {}

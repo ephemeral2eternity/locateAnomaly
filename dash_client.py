@@ -25,45 +25,46 @@ from cooperation import *
 from cfds_logger_utils import *
 
 ## ==================================================================================================
-# Define client_agent method that streams a video using client cooperation based control
+# Define dash_client method that streams a video using common dash player with general server selection
+# method in CDN
 # @input : cache_agent_obj --- the dict denoting cache agent ip and name
 #		   video_id --- the video id the client is requesting
 #		   method --- determine the fault tolerance solution of the client
 #						
 ## ==================================================================================================
-def coop_client(cache_agent_obj, video_id, method, expID=None, COOP_PERIOD=6):
+def dash_client(cache_agent_obj, video_id, method, expID=None, DASH_PERIOD=6):
 
 	## ==================================================================================================
 	## Client name and info
 	client = str(socket.gethostname())
 	if expID:
-		client_ID = "coop_" + client + "_" + expID + "_" + method
+		client_ID = client + "_" + expID + "_" + method
 	else:
 		cur_ts = time.strftime("%m%d%H%M")
-		client_ID = "coop_" + client + "_" + cur_ts + "_" + method
+		client_ID = client + "_" + cur_ts + "_" + method
 
 	## ==================================================================================================
 	## Get the initial streaming server
-	srv_info = get_srv(cache_agent_obj['ip'], video_id, "rtt")
+	srv_info = get_srv(cache_agent_obj['ip'], video_id, method)
 
 	## The cache agent does not give a server for streaming
 	## Try to change the cache agent by cooperating with closeby peers.
-	if not srv_info:
-		cache_agent_obj, srv_info = ft_cache_agent(cache_agent_obj, video_id)
+	#if not srv_info:
+	#	cache_agent_obj, srv_info = ft_cache_agent(cache_agent_obj, video_id)
 
 	## ==================================================================================================
 	## Get closeby clients from the closest cache agent.
 	## We by default assume the p_peers list will be obtained if cache agent is on.
-	p_peers = get_peers(cache_agent_obj['ip'], "pclient")
-	if not p_peers:
-		p_peers = ft_pv_peers(cache_agent_obj['ip'], "pclient")
+	#p_peers = get_peers(cache_agent_obj['ip'], "pclient")
+	#if not p_peers:
+	#	p_peers = ft_pv_peers(cache_agent_obj['ip'], "pclient")
 
 	## Get peer client from the streaming server. We by default assume the v_peers list will be obtained
 	# if the cache agent on this streaming server is on.
 	# If our agent is not running, we report the error directly as redirector fault.
-	v_peers = get_peers(srv_info['ip'], "vclient")
-	if not v_peers:
-		v_peers = ft_pv_peers(srv_info['ip'], "vclient") 
+	#v_peers = get_peers(srv_info['ip'], "vclient")
+	#if not v_peers:
+	#	v_peers = ft_pv_peers(srv_info['ip'], "vclient") 
 
 	## ==================================================================================================
 	## Parse the mpd file for the streaming video
@@ -76,10 +77,10 @@ def coop_client(cache_agent_obj, video_id, method, expID=None, COOP_PERIOD=6):
 	rsts = mpd_parser(srv_info['ip'], videoName)
 
 	## Add mpd_parser failure handler
-	if not rsts:
+	#if not rsts:
 		## If the client can not download the mpd file for the video, the server is probably down or there
 		# might be byzantine faults where
-		[srv_info, rsts] = coop_ft_srv_mpd(cache_agent_obj['ip'], srv_info, video_id, v_peers, p_peers)
+	#	[srv_info, rsts] = coop_ft_srv_mpd(cache_agent_obj['ip'], srv_info, video_id, v_peers, p_peers)
 
 	### ===========================================================================================================
 	vidLength = int(rsts['mediaDuration'])
@@ -145,13 +146,13 @@ def coop_client(cache_agent_obj, video_id, method, expID=None, COOP_PERIOD=6):
 		### ===========================================================================================================
 		## Client Cooperation based Fault Tolerance the timeout of chunk request
 		### ===========================================================================================================
-		if vchunk_sz == 0:
-			logging.info("[" + client_ID + "]Agens client can not download chunks video " + videoName + " from server " + srv_info['srv'] + \
-			" 3 times. Stop and exit the streaming!!!")
-
-			(srv_info, vchunk_sz) = coop_ft_srv_chunk(srv_info, video_id, vidChunk, v_peers, p_peers)
-		else:
-			error_num = 0
+		#if vchunk_sz == 0:
+		#	logging.info("[" + client_ID + "]Agens client can not download chunks video " + videoName + " from server " + srv_info['srv'] + \
+		#	" 3 times. Stop and exit the streaming!!!")
+		#
+		#	(srv_info, vchunk_sz) = coop_ft_srv_chunk(srv_info, video_id, vidChunk, v_peers, p_peers)
+		#else:
+		#	error_num = 0
 		### ===========================================================================================================
 
 		curTS = time.time()
@@ -180,7 +181,7 @@ def coop_client(cache_agent_obj, video_id, method, expID=None, COOP_PERIOD=6):
 		srv_qoe_tr[chunkNext] = chunk_QoE
 
 		# Select server for next 12 chunks
-		if chunkNext%COOP_PERIOD == 0 and chunkNext > (COOP_PERIOD - 1):
+		if chunkNext%DASH_PERIOD == 0 and chunkNext > (DASH_PERIOD - 1):
 			mnQoE = averageQoE(srv_qoe_tr)
 			update_qoe(cache_agent_obj['ip'], srv_info['srv'], mnQoE, alpha)
 
@@ -190,7 +191,7 @@ def coop_client(cache_agent_obj, video_id, method, expID=None, COOP_PERIOD=6):
 
 			#=========================================================================================================
 			## Client Cooperation based Adaptive Server Selection
-			srv_info = coop_qoe_srv_selection(mnQoE, srv_info, video_id, p_peers, v_peers)
+			# srv_info = coop_qoe_srv_selection(mnQoE, srv_info, video_id, p_peers, v_peers)
 
 		# Update iteration information
 		curBuffer = curBuffer + chunkLen

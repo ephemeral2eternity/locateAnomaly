@@ -4,25 +4,28 @@
 # chenw@andrew.cmu.edu
 import random
 import sys
+import os
 import logging
 import shutil
+from datetime import datetime
 from coop_client import *
 from test_utils import *
+from client_utils import *
 from attach_cache_agent import *
 
 ### Get client name and attache to the closest cache agent
 client_name = getMyName()
+
+### Config logging options
+config_logger()
+
+### Cannot even obtain a cache agent
 cache_agent = attach_cache_agent()
-
 if not cache_agent:
-	reportErrorQoE(client_name)
+	msg = "The client fails to connect to the centralized controller: cmu-agens. The client may lose Internet connection!"
+	msg_type = 1
+	local_fault_msg_logger(client_name, "cmu-agens", -1, msg, msg_type)
 	sys.exit()
-
-## Config logging level
-logging.basicConfig(filename='agens_' + client_name + '.log', level=logging.INFO)
-
-## Try several times to confirm the lose connection of client agent
-# cache_agent = attach_cache_agent(client_name)
 
 print "Client ", client_name, " is connecting to cache agent : ", cache_agent['name']
 cache_agent_ip = cache_agent['ip']
@@ -42,6 +45,6 @@ for i in range(1):
 	video_id = weighted_choice(zipf_cdf)
 
 	## Testing rtt based server selection
-	method = 'nocoop'
+	method = 'coop'
 	waitRandom(1, 100)
-	coop_agent(cache_agent, video_id, method)
+	coop_client(cache_agent, 1, method)
