@@ -44,7 +44,7 @@ def simple_client(cache_agent_ip, srv_info, video_name):
 
 	if not rsts:
 		update_qoe(cache_agent_ip, srv_info['ip'], 0, 0.9)
-		sys.exit()
+		return
 
 	### ===========================================================================================================
 	vidLength = int(rsts['mediaDuration'])
@@ -113,7 +113,7 @@ def simple_client(cache_agent_ip, srv_info, video_name):
 		### ===========================================================================================================
 		if vchunk_sz == 0:
 			update_qoe(cache_agent_ip, srv_info['srv'], 0, 0.9)
-			sys.exit()
+			return
 		else:
 			error_num = 0
 		### ===========================================================================================================
