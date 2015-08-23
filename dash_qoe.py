@@ -19,7 +19,7 @@ def computeQoE(freezing_time, cur_bw, max_bw):
 	if freezing_time > 0:
 		q[0] = b[0] - b[1] / (1 + math.pow((b[2]/freezing_time), b[3]))
 
-	q[1] = a[0] * math.log(a[1]*cur_bw/max_bw)
+	q[1] = a[0] * math.log(a[1]*float(cur_bw)/float(max_bw))
 
 	qoe = delta * q[0] + (1 - delta) * q[1]
 	return qoe
@@ -28,10 +28,10 @@ def computeQoE(freezing_time, cur_bw, max_bw):
 # Get the average of previous 12 chunk QoEs (1 minute) on a given server
 # @input : srv_qoe_tr --- the per chunk qoe dictionary with the key as the chunk ID
 ## ==================================================================================================
-def averageQoE(srv_qoe_tr):
+def averageQoE(srv_qoe_tr, intvl):
 	mn_QoE = 0.0
 	curSrvNum = 0
-	if len(srv_qoe_tr) < 6:
+	if len(srv_qoe_tr) < intvl:
 		for chunk_id in srv_qoe_tr.keys():
 			curSrvNum = curSrvNum + 1
 			mn_QoE += srv_qoe_tr[chunk_id]
@@ -39,7 +39,7 @@ def averageQoE(srv_qoe_tr):
 	else:
 		## Study chunks in the previous 1 minute
 		chunk_ids = sorted(srv_qoe_tr.keys())
-		last_minute_chunk_ids = chunk_ids[-6:]
+		last_minute_chunk_ids = chunk_ids[-intvl:]
 		print "Average QoE for chunk ids: ", str(last_minute_chunk_ids)
 		for chunk_id in last_minute_chunk_ids:
 			curSrvNum = curSrvNum + 1
